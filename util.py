@@ -17,9 +17,9 @@ class Button():
 
 	def draw(self, win):
 
-		#for debug
-		if self.x == 50:
-			print(self.hover, self.pressed)
+		# #for debug
+		# if self.x == 50:
+		# 	print(self.hover, self.pressed)
 
 		if self.hover == False:
 			self.pressed = False
