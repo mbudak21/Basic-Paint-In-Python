@@ -1,4 +1,4 @@
-import pygame
+import pygame, math
 
 class Button():
 	def __init__(self, x, y, w, h, idle_color, hover_color, pressed_color, func, text=""):
@@ -16,7 +16,13 @@ class Button():
 
 
 	def draw(self, win):
-		
+
+		#for debug
+		if self.x == 50:
+			print(self.hover, self.pressed)
+
+		if self.hover == False:
+			self.pressed = False
 		if not self.hover and not self.pressed:
 			pygame.draw.rect(win, self.idle_color, (self.x,self.y,self.width,self.height),0)
 
@@ -147,8 +153,22 @@ class cursor_brush:
 		cls.cursor = self
 
 	@classmethod
+	def change_brush_size(cls, n):
+		if n > 0:
+			cursor_brush.size += n
+		elif n < 0:
+			if cursor_brush.size > 1:
+				cursor_brush.size += n
+
+	@classmethod
+	def change_brush_color(cls, color):
+		spot.brush_color = color
+		cursor_brush.color = color
+
+	@classmethod
 	def draw(cls, win):
-		pygame.draw.rect(win, cls.color, cls.rect)
+		#pygame.draw.rect(win, cls.color, cls.rect)
+		pygame.draw.ellipse(win, cls.color, cls.rect)
 
 	@classmethod
 	def set_cursor(cls):
@@ -158,7 +178,19 @@ class cursor_brush:
 
 	@classmethod
 	def check_collision(cls, in_object):
-		return in_object.colliderect(cls.rect)
+		#return in_object.colliderect(cls.rect) #check the collison assuming the brush is a rect 
+		
+
+		if cursor_brush.get_center_to_side_length(in_object) < cls.size:
+			return True
+
+	@classmethod
+	def get_center_to_side_length(cls, rect_obj): #return hypothenuse of rect_obj(dist from center to side, assuming its a circle)
+		m1 = cls.rect.center
+		p1 = (rect_obj.x, rect_obj.y)
+		h = math.sqrt(((m1[0]-p1[0])**2)+(m1[1]-p1[1])**2)
+		return h
+
 
 	@classmethod
 	def check_collision_list(cls, in_list):
@@ -173,8 +205,6 @@ class cursor_brush:
 		out_list = []
 		for i in in_array:
 			for j in i:
-				if j.rect.colliderect(cls.rect):
+				if cursor_brush.check_collision(j):
 					out_list.append(j)
 		return out_list
-
-
